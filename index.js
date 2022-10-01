@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+app.use(express.json())
 
 let persons = [
   {
@@ -27,6 +28,28 @@ app.get('/info', (req, res) => {
 
 app.get('/api/persons', (req, res) => {
   res.json(persons)
+})
+
+app.post('/api/persons', (req, res) => {
+  const newPerson = req.body
+  if (!newPerson.name) {
+    return res.status(400).json({
+      error: 'name missing'
+    })
+  }
+  if (!newPerson.number) {
+    return res.status(400).json({
+      error: 'number missing'
+    })
+  }
+  if (persons.find(person => person.name === newPerson.name)) {
+    return res.status(400).json({
+      error: 'duplicate contact'
+    })
+  }
+  newPerson.id = Math.ceil(Math.random() * 1000000)
+  persons.push(newPerson)
+  res.json(newPerson)
 })
 
 app.get('/api/persons/:id', (request, response) => {
